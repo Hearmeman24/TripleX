@@ -5,6 +5,7 @@ import json
 import os
 import shutil
 import sys
+import time
 
 import cv2
 import google.generativeai as genai
@@ -16,6 +17,8 @@ load_dotenv()
 
 # --- FALLBACK MODEL LISTS ---
 INDIVIDUAL_FALLBACK_MODELS = [
+    "gemini-2.0-flash-001",
+    "gemini-2.0-flash-lite-001",
     "gemini-2.0-flash-thinking-exp-01-21",
     "gemini-2.0-flash-exp",
     "gemini-2.0-flash",
@@ -25,6 +28,8 @@ INDIVIDUAL_FALLBACK_MODELS = [
 ]
 
 COMPOSITE_FALLBACK_MODELS = [
+    "gemini-2.0-flash-001",
+    "gemini-2.0-flash-lite-001",
     "gemini-2.0-pro-exp-02-05",
     "gemini-2.0-flash-thinking-exp-01-21",
     "gemini-2.0-flash-exp",
@@ -377,10 +382,11 @@ def main():
             file_paths.append(file_path)
 
     # Use a thread pool to process files concurrently
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         futures = [executor.submit(process_file, fp, args, video_exts, image_exts) for fp in file_paths]
         # Optionally wait for all jobs to complete and handle exceptions
         for future in concurrent.futures.as_completed(futures):
+            time.sleep(1)
             try:
                 future.result()
             except Exception as e:
